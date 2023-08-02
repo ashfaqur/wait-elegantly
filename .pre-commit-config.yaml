@@ -4,3 +4,9 @@ repos:
     hooks:
     - id: black
       language_version: python3.10
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: ''
+  hooks:
+    - id: mypy
+      args: [--strict, --ignore-missing-imports]
+      additional_dependencies: [tokenize-rt==3.2.0]
