@@ -26,7 +26,7 @@ def look_for_error(logs: list[str], triages: dict[str, str]) -> Tuple[str, str]:
                 logger.info(f"   ERROR FOUND:   {line}")
                 logger.info(f"   RESOLUTION:    {v}")
                 logger.info("------------------------------------------------")
-                return k, v
+                return line, v
     return "", ""
 
 
