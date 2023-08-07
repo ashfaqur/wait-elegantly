@@ -1,0 +1,2 @@
+[INFO] Here is some sample logs.
+[INFO] Some more trivial logs.
