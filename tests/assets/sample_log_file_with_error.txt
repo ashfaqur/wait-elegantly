@@ -1,0 +1,3 @@
+[INFO] Here is some sample logs.
+[INFO] Some more trivial logs.
+[ERROR] Ohh an error happened. Wonder what is it.
