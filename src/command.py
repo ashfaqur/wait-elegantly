@@ -28,25 +28,21 @@ class Command:
         log_dir = Path("build/log")
         log_dir.mkdir(parents=True, exist_ok=True)
 
-        history = Path(f"build/history/{self.id}.txt")
-        history.parent.mkdir(parents=True, exist_ok=True)
-        history.touch()
+        history_file = f"build/history/{self.id}.txt"
+        history_times: List[int] = get_history_times(history_file)
 
-        with open(history, "r") as f:
-            numbers: List[int] = [int(line.strip()) for line in f]
+        avg_time: int = 0
 
-        logger.info(f"Running command: {self.name}")
-
-        if numbers:
-            expected_time = round(sum(numbers) / len(numbers))
-            logger.info(f"Average time to complete: {expected_time}s")
-        else:
-            expected_time = 0
+        if history_times:
+            avg_time = round(sum(history_times) / len(history_times))
+            logger.debug(f"Average time to complete: {avg_time}s")
 
         now = datetime.now()
         formatted_timestamp = now.strftime("%H-%M-%S_%d-%m-%Y")
         log_file_name = f"{self.id}_{formatted_timestamp}.txt"
         log_file_path = log_dir / log_file_name
+
+        logger.info(f"Running command: {self.name}")
         logger.info(f"Log file located in: {log_file_path}")
 
         with open(log_file_path, "w") as log_file:
@@ -63,7 +59,7 @@ class Command:
                     " ",
                     progressbar.ETA(),
                 ],
-                max_value=expected_time,
+                max_value=avg_time,
             )
             bar.start()
             while process.poll() is None:
@@ -73,24 +69,42 @@ class Command:
             total_time = round(time.time() - start_time)
             bar.finish()
 
-            difference = round(total_time - expected_time)
-            if difference > 0:
-                logger.info(
-                    f"Total time: {total_time}s. Took {abs(difference)}s MORE than expected."
-                )
-            else:
-                logger.info(
-                    f"Total time: {total_time}s. Took {abs(difference)}s less than expected."
-                )
-
             if process.returncode != 0:
                 logger.error(f"Process '{self.name}' FAILED")
                 analyze_log_file(log_file_path, triage_file)
             else:
-                logger.info(
-                    f"Process '{self.name}' SUCCESSFUL. Time saved in: {history}"
-                )
-                with history.open("a") as f:
-                    f.write(f"{total_time}\n")
+                logger.info(f"Command '{self.name}' SUCCESSFUL.")
+                result: str = get_time_diff_result(total_time, avg_time)
+                logger.info(result)
+                logger.debug(f"Time saved in: {history_file}")
+                add_history_time(history_file, total_time)
 
-            logger.info("----- COMMAND FINISHED -----")
+            logger.debug("----- COMMAND FINISHED -----")
+
+
+def get_time_diff_result(total_time: int, expected_time: int) -> str:
+    difference: int = total_time - expected_time
+    if difference > 0:
+        return f"Total time: {total_time}s. Took {abs(difference)}s MORE than expected."
+    else:
+        return f"Total time: {total_time}s. Took {abs(difference)}s less than expected."
+
+
+def get_history(path: str) -> Path:
+    history = Path(path)
+    history.parent.mkdir(parents=True, exist_ok=True)
+    history.touch()
+    return history
+
+
+def get_history_times(path: str) -> List[int]:
+    history: Path = get_history(path)
+    with open(history, "r") as f:
+        numbers: List[int] = [int(line.strip()) for line in f]
+        return numbers
+
+
+def add_history_time(path: str, total_time: int) -> None:
+    history: Path = get_history(path)
+    with history.open("a") as f:
+        f.write(f"{total_time}\n")

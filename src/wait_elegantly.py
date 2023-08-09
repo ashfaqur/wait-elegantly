@@ -1,5 +1,6 @@
 import argparse
 import logging
+import time
 
 import yaml
 
@@ -10,18 +11,20 @@ logger = logging.getLogger("Wait_Elegantly")
 
 
 def wait_elegantly(config: str, triage_file_path: str) -> None:
-    logger.info(f"Loading yaml configuration file {config}")
+    logger.debug(f"Loading yaml configuration: {config}")
     with open(config, "r") as f:
         data = yaml.safe_load(f)
 
+    start_time = time.time()
     [Command(command).run(triage_file_path) for command in data[COMMANDS_KEY]]
+    logger.info(f"Total time: {round(time.time() - start_time)}s")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Wait Elegantly while commands executes"
+        description="Wait elegantly while commands executes"
     )
-    parser.add_argument("path", type=str, help="Path to a config yaml file")
+    parser.add_argument("config", type=str, help="Path to a config yaml file")
     parser.add_argument("triage", type=str, help="Path to a triage error json file")
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Set the log level to DEBUG"
@@ -31,10 +34,15 @@ if __name__ == "__main__":
     log_level = logging.INFO
     if args.verbose:
         log_level = logging.DEBUG
-    logging.basicConfig(level=log_level)
 
-    config_file: str = args.path
+    logging.basicConfig(
+        format="%(asctime)s %(module)s %(levelname)-8s %(message)s",
+        level=log_level,
+        datefmt="%H:%M:%S",
+    )
+
+    config_file: str = args.config
     triage_file: str = args.triage
 
-    logger.info("------ Wait Elegantly --------s")
+    logger.debug("------ Wait Elegantly --------")
     wait_elegantly(config_file, triage_file)
