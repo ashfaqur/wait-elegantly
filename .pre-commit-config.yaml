@@ -8,7 +8,7 @@ repos:
     rev: 'v1.4.1'
     hooks:
     - id: mypy
-      args: [--strict, --ignore-missing-imports, --install-types]
+      args: [--strict, --ignore-missing-imports]
       additional_dependencies: [tokenize-rt==3.2.0]
   - repo: https://github.com/pycqa/flake8
     rev: '6.1.0'

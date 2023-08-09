@@ -53,7 +53,7 @@ class Command:
                 widgets=[
                     progressbar.Percentage(),
                     " ",
-                    progressbar.Bar(),
+                    progressbar.GranularBar(),
                     " ",
                     progressbar.ETA(),
                 ],
@@ -72,9 +72,13 @@ class Command:
 
             difference = round(total_time - expected_time)
             if difference > 0:
-                print(f"Took {abs(difference)}s MORE than expected")
+                print(
+                    f"Total {total_time}s. Took {abs(difference)}s MORE than average."
+                )
             else:
-                print(f"Took {abs(difference)}s less than expected")
+                print(
+                    f"Total {total_time}s. Took {abs(difference)}s less than average."
+                )
 
             if process.returncode == 0:
                 print("FAILED")
