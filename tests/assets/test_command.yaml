@@ -1,0 +1,11 @@
+commands:
+  - name: "list files"
+    id: "ls"
+    values:
+      - "ls"
+      - "-al"
+  - name: "Sleep for 2 seconds"
+    id: "sleep2s"
+    values:
+      - "sleep"
+      - "2"
