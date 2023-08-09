@@ -38,7 +38,7 @@ class Command:
         logger.info(f"Running command: {self.name}")
 
         if numbers:
-            expected_time = sum(numbers) / len(numbers)
+            expected_time = round(sum(numbers) / len(numbers))
             logger.info(f"Average time to complete: {expected_time}s")
         else:
             expected_time = 0
@@ -47,7 +47,7 @@ class Command:
         formatted_timestamp = now.strftime("%H-%M-%S_%d-%m-%Y")
         log_file_name = f"{self.id}_{formatted_timestamp}.txt"
         log_file_path = log_dir / log_file_name
-        logger.info(f"Log file located in {log_file_path}")
+        logger.info(f"Log file located in: {log_file_path}")
 
         with open(log_file_path, "w") as log_file:
             start_time = time.time()
@@ -76,11 +76,11 @@ class Command:
             difference = round(total_time - expected_time)
             if difference > 0:
                 logger.info(
-                    f"Total {total_time}s. Took {abs(difference)}s MORE than expected."
+                    f"Total time: {total_time}s. Took {abs(difference)}s MORE than expected."
                 )
             else:
                 logger.info(
-                    f"Total {total_time}s. Took {abs(difference)}s less than expected."
+                    f"Total time: {total_time}s. Took {abs(difference)}s less than expected."
                 )
 
             if process.returncode != 0:
@@ -88,9 +88,9 @@ class Command:
                 analyze_log_file(log_file_path, triage_file)
             else:
                 logger.info(
-                    f"Process '{self.name}' SUCCESSFUL. Time saved in file {history}"
+                    f"Process '{self.name}' SUCCESSFUL. Time saved in: {history}"
                 )
                 with history.open("a") as f:
                     f.write(f"{total_time}\n")
 
-            logger.info("-------------------------------------------------------")
+            logger.info("----- COMMAND FINISHED -----")
