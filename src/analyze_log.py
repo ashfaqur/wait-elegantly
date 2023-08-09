@@ -27,6 +27,7 @@ def look_for_error(logs: List[str], triages: Dict[str, str]) -> Tuple[str, str]:
                 logger.info(f"   RESOLUTION:    {v}")
                 logger.info("------------------------------------------------")
                 return line, v
+    logger.debug("No error resolution found")
     return "", ""
 
 
@@ -45,7 +46,7 @@ def load_logs(log_file_path: str) -> List[str]:
 
 def load_triages(triage_file_path: str) -> Dict[str, str]:
     try:
-        with open("tests/assets/sample_triage_file.json", "r") as f:
+        with open(triage_file_path, "r") as f:
             triages: Dict[str, str] = json.load(f)
             return triages
     except json.JSONDecodeError as e:
