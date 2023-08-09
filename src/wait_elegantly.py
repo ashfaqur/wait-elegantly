@@ -7,7 +7,7 @@ import yaml
 from command import COMMANDS_KEY
 from command import Command
 
-logger = logging.getLogger("Wait_Elegantly")
+logger = logging.getLogger(__name__)
 
 
 def wait_elegantly(config: str, triage_file_path: str) -> None:
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         log_level = logging.DEBUG
 
     logging.basicConfig(
-        format="%(asctime)s %(module)s %(levelname)-8s %(message)s",
+        format="%(asctime)s %(levelname)-8s %(message)s",
         level=log_level,
         datefmt="%H:%M:%S",
     )

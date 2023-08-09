@@ -28,7 +28,7 @@ class Command:
         log_dir = Path("build/log")
         log_dir.mkdir(parents=True, exist_ok=True)
 
-        history_file = f"build/history/{self.id}.txt"
+        history_file: str = f"build/history/{self.id}.txt"
         history_times: List[int] = get_history_times(history_file)
 
         avg_time: int = 0
@@ -73,9 +73,8 @@ class Command:
                 logger.error(f"Process '{self.name}' FAILED")
                 analyze_log_file(log_file_path, triage_file)
             else:
-                logger.info(f"Command '{self.name}' SUCCESSFUL.")
                 result: str = get_time_diff_result(total_time, avg_time)
-                logger.info(result)
+                logger.info(f"Command '{self.name}' SUCCESSFUL {result}")
                 logger.debug(f"Time saved in: {history_file}")
                 add_history_time(history_file, total_time)
 
@@ -85,9 +84,9 @@ class Command:
 def get_time_diff_result(total_time: int, expected_time: int) -> str:
     difference: int = total_time - expected_time
     if difference > 0:
-        return f"Total time: {total_time}s. Took {abs(difference)}s MORE than expected."
+        return f"in {total_time}s. Took {abs(difference)}s MORE than expected."
     else:
-        return f"Total time: {total_time}s. Took {abs(difference)}s less than expected."
+        return f"in {total_time}s. Took {abs(difference)}s less than expected."
 
 
 def get_history(path: str) -> Path:
