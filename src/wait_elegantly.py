@@ -36,4 +36,5 @@ if __name__ == "__main__":
     config_file: str = args.path
     triage_file: str = args.triage
 
+    logger.info("------ Wait Elegantly --------s")
     wait_elegantly(config_file, triage_file)
