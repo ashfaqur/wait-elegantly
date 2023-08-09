@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from typing import List, Dict
 
 import progressbar
 
@@ -18,10 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 class Command:
-    def __init__(self, command: dict[str, Any]):
+    def __init__(self, command: Dict[str, Any]):
         self.name: str = command[COMMAND_NAME]
         self.id: str = command[COMMAND_ID]
-        self.values: list[str] = command[COMMAND_VALUES]
+        self.values: List[str] = command[COMMAND_VALUES]
 
     def run(self, triage_file: str) -> None:
         log_dir = Path("build/log")
@@ -32,7 +33,7 @@ class Command:
         history.touch()
 
         with open(history, "r") as f:
-            numbers: list[int] = [int(line.strip()) for line in f]
+            numbers: List[int] = [int(line.strip()) for line in f]
 
         logger.info(f"Running command: {self.name}")
 
