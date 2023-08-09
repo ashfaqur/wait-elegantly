@@ -6,12 +6,15 @@ import yaml
 from command import COMMANDS_KEY
 from command import Command
 
+logger = logging.getLogger("Wait_Elegantly")
 
-def wait_elegantly(config: str, triage_file: str) -> None:
+
+def wait_elegantly(config: str, triage_file_path: str) -> None:
+    logger.info(f"Loading yaml configuration file {config}")
     with open(config, "r") as f:
         data = yaml.safe_load(f)
 
-    [Command(command).run(triage_file) for command in data[COMMANDS_KEY]]
+    [Command(command).run(triage_file_path) for command in data[COMMANDS_KEY]]
 
 
 if __name__ == "__main__":
@@ -26,7 +29,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     log_level = logging.INFO
-    # Set the log level
     if args.verbose:
         log_level = logging.DEBUG
     logging.basicConfig(level=log_level)

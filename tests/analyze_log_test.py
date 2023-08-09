@@ -1,8 +1,4 @@
-import os
-
 from src.analyze_log import analyze_log_file
-
-print(os.getcwd())
 
 
 def test_analysis_empty() -> None:
