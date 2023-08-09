@@ -8,4 +8,4 @@ commands:
     id: "sleep2s"
     values:
       - "sleep"
-      - "5"
+      - "2"
