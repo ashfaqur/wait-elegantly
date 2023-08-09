@@ -46,7 +46,7 @@ class Command:
         formatted_timestamp = now.strftime("%H-%M-%S_%d-%m-%Y")
         log_file_name = f"{self.id}_{formatted_timestamp}.txt"
         log_file_path = log_dir / log_file_name
-        logger.error(f"Log file located in {log_file_path}")
+        logger.info(f"Log file located in {log_file_path}")
 
         with open(log_file_path, "w") as log_file:
             start_time = time.time()
@@ -68,7 +68,7 @@ class Command:
             while process.poll() is None:
                 time.sleep(1)
                 if bar.value < bar.max_value:
-                    bar.update(1)
+                    bar.update(bar.value + 1)
             total_time = round(time.time() - start_time)
             bar.finish()
 
