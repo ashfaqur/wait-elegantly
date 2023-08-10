@@ -21,8 +21,8 @@ root: Path = Path(__file__).parent.parent
 
 class Command:
     def __init__(self, command: Dict[str, Any]):
-        self.name: str = command[COMMAND_NAME]
-        self.id: str = command[COMMAND_ID]
+        self.name: str = get_cmd_name(command)
+        self.id: str = get_cmd_id(command)
         self.values: List[str] = command[COMMAND_VALUES]
 
     def run(self, triage_file: str, granular: bool) -> None:
@@ -55,6 +55,24 @@ class Command:
                 add_history_time(history_file, total_time)
 
             logger.debug("----- COMMAND FINISHED -----")
+
+
+def get_cmd_name(command: Dict[str, Any]) -> str:
+    name: str = command[COMMAND_NAME]
+    if not all(ord(c) < 128 for c in name):
+        raise ValueError("Name contains non-ASCII characters")
+    if len(name) >= 500:
+        raise ValueError("Name is too long")
+    return name
+
+
+def get_cmd_id(command: Dict[str, Any]) -> str:
+    cmd_id: str = command[COMMAND_ID]
+    if not all(c.isalnum() or c in ("-", "_") for c in cmd_id):
+        raise ValueError("ID must only contain alphanumeric with dash or underscores")
+    if len(cmd_id) >= 100:
+        raise ValueError("ID is too long, more than 100 characters")
+    return cmd_id
 
 
 def get_time_diff_result(total_time: int, expected_time: int) -> str:
