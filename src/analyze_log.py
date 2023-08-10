@@ -23,11 +23,11 @@ def look_for_error(logs: List[str], triages: Dict[str, str]) -> Tuple[str, str]:
         for k, v in triages.items():
             if k in line:
                 logger.info("------------------------------------------------")
-                logger.info(f"   ERROR FOUND:   {line}")
-                logger.info(f"   RESOLUTION:    {v}")
+                logger.info(f"ERROR FOUND:   {line}")
+                logger.info(f"RESOLUTION:    {v}")
                 logger.info("------------------------------------------------")
                 return line, v
-    logger.debug("No error resolution found")
+    logger.debug("Unknown Error")
     return "", ""
 
 
