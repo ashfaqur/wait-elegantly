@@ -63,3 +63,6 @@ class Progress:
         else:
             stdout.write("\n")
             stdout.flush()
+
+    def expected_time(self) -> int:
+        return self.avg_time

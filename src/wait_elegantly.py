@@ -10,7 +10,7 @@ from command import Command
 logger = logging.getLogger(__name__)
 
 
-def wait_elegantly(config: str, triage: str) -> None:
+def wait_elegantly(config: str, triage: str, granular: bool) -> None:
     logger.debug(f"Loading yaml configuration file: {config}")
     if triage:
         logger.debug(f"Using triage file: {triage}")
@@ -19,7 +19,7 @@ def wait_elegantly(config: str, triage: str) -> None:
     with open(config, "r") as f:
         data = yaml.safe_load(f)
     start_time = time.time()
-    [Command(command).run(triage) for command in data[COMMANDS_KEY]]
+    [Command(command).run(triage, granular) for command in data[COMMANDS_KEY]]
     logger.info(f"Total time: {round(time.time() - start_time)}s")
 
 
@@ -33,6 +33,9 @@ def args_parser() -> ArgumentParser:
     )
     arg_parser.add_argument(
         "-v", "--verbose", action="store_true", help="Set the log level to DEBUG"
+    )
+    arg_parser.add_argument(
+        "-g", "--granular", action="store_true", help="Set progress bar to granular"
     )
     return arg_parser
 
@@ -50,4 +53,5 @@ if __name__ == "__main__":
     )
     config_file: str = args.config
     triage_file: str = args.triage
-    wait_elegantly(config_file, triage_file)
+    granular_bar: bool = args.granular
+    wait_elegantly(config_file, triage_file, granular_bar)

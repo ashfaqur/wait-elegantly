@@ -25,15 +25,9 @@ class Command:
         self.id: str = command[COMMAND_ID]
         self.values: List[str] = command[COMMAND_VALUES]
 
-    def run(self, triage_file: str) -> None:
+    def run(self, triage_file: str, granular: bool) -> None:
         history_file: Path = root / Path(f"build/history/{self.id}.txt")
         history_times: List[int] = get_history_times(history_file)
-
-        avg_time: int = 0
-
-        if history_times:
-            avg_time = round(sum(history_times) / len(history_times))
-            logger.debug(f"Average time to complete: {avg_time}s")
 
         log_file_path: Path = get_log_file_path(self.id)
         logger.info(f"Running command '{self.name}' with log: {log_file_path}")
@@ -43,7 +37,7 @@ class Command:
             process = subprocess.Popen(
                 self.values, stdout=log_file, stderr=log_file, universal_newlines=True
             )
-            progress = Progress(history_times, False)
+            progress = Progress(history_times, granular)
             while process.poll() is None:
                 time.sleep(1)
                 progress.update()
@@ -51,11 +45,11 @@ class Command:
             progress.finish()
 
             if process.returncode != 0:
-                logger.error(f"Command '{self.name}' FAILED")
                 if triage_file:
                     analyze_log_file(log_file_path, triage_file)
+                raise RuntimeError(f"Command '{self.id}' FAILED")
             else:
-                result: str = get_time_diff_result(total_time, avg_time)
+                result: str = get_time_diff_result(total_time, progress.expected_time())
                 logger.info(f"Command '{self.name}' SUCCESSFUL {result}")
                 logger.debug(f"Time saved in: {history_file}")
                 add_history_time(history_file, total_time)
@@ -64,11 +58,16 @@ class Command:
 
 
 def get_time_diff_result(total_time: int, expected_time: int) -> str:
-    difference: int = total_time - expected_time
-    if difference > 0:
-        return f"in {total_time}s. Took {abs(difference)}s MORE than expected."
-    else:
-        return f"in {total_time}s. Took {abs(difference)}s less than expected."
+    time_taken: str = f"in {total_time}s"
+    difference_time: str = ""
+    if expected_time > 0:
+        difference: int = total_time - expected_time
+        if difference > 0:
+            difference_time = f"Took {abs(difference)}s MORE than expected."
+        else:
+            difference_time = f"Took {abs(difference)}s less than expected."
+
+    return f"{time_taken}. {difference_time}"
 
 
 def get_log_file_path(command_id: str) -> Path:
