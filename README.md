@@ -45,4 +45,4 @@ You can specify an optional triage json file containing error strings you have p
 
     {"[ERROR] Ohh an error happened" :  "No worries. Here is a workaround!"}
 
-If the command fails, the script will look for known issues in the command for you.
+If the command fails, the script will look for known issues in the log for you.
