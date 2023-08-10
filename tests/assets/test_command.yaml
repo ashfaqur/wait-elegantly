@@ -4,8 +4,8 @@ commands:
     values:
       - "ls"
       - "-al"
-  - name: "A long running task"
-    id: "long_run"
+  - name: "Sleep for 2 seconds"
+    id: "sleep2s"
     values:
       - "sleep"
-      - "15"
+      - "2s"
