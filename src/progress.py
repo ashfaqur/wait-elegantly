@@ -1,9 +1,10 @@
-import sys
+from sys import stdout
 from typing import List
 
 from progressbar import ProgressBar, Percentage, Bar, GranularBar, ETA
 
 SHOW_PROGRESS_BAR_FROM = 2  # seconds
+PROGRESS_DOT_CHAR_COUNT = 50
 
 
 class Progress:
@@ -11,8 +12,7 @@ class Progress:
         self.avg_time: int = -1
         self.max_time: int = -1
         self.min_time: int = -1
-        self.animation: list[str] = [".", "..", "..."]
-        self.animation_index = 0
+        self.counter: int = 0
         self.bar = None
 
         if history:
@@ -43,19 +43,23 @@ class Progress:
             )
             self.bar.start()
         else:
-            pass
+            stdout.write("\rIn Progress...")
 
     def update(self) -> None:
+        self.counter = self.counter + 1
         if self.bar:
             if self.bar.value < self.bar.max_value:
                 self.bar.update(self.bar.value + 1)
         else:
-            sys.stdout.write(f"\rWorking {self.animation[self.animation_index]}")
-            sys.stdout.flush()
-            self.animation_index = self.animation_index + 1
-            if self.animation_index > len(self.animation):
-                self.animation_index = 0
+            stdout.write(".")
+            stdout.flush()
+            if self.counter % PROGRESS_DOT_CHAR_COUNT == 0:
+                stdout.write("\n\rIn Progress...")
+                stdout.flush()
 
     def finish(self) -> None:
         if self.bar:
             self.bar.finish()
+        else:
+            stdout.write("\n")
+            stdout.flush()

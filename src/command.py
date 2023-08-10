@@ -6,9 +6,8 @@ from pathlib import Path
 from typing import Any
 from typing import List, Dict
 
-import progressbar
-
 from analyze_log import analyze_log_file
+from progress import Progress
 
 COMMANDS_KEY = "commands"
 COMMAND_NAME = "name"
@@ -44,24 +43,12 @@ class Command:
             process = subprocess.Popen(
                 self.values, stdout=log_file, stderr=log_file, universal_newlines=True
             )
-
-            bar = progressbar.ProgressBar(
-                widgets=[
-                    progressbar.Percentage(),
-                    " ",
-                    progressbar.GranularBar(),
-                    " ",
-                    progressbar.ETA(),
-                ],
-                max_value=avg_time,
-            )
-            bar.start()
+            progress = Progress(history_times, False)
             while process.poll() is None:
                 time.sleep(1)
-                if bar.value < bar.max_value:
-                    bar.update(bar.value + 1)
+                progress.update()
             total_time = round(time.time() - start_time)
-            bar.finish()
+            progress.finish()
 
             if process.returncode != 0:
                 logger.error(f"Command '{self.name}' FAILED")
