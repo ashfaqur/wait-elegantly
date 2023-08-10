@@ -1,7 +1,7 @@
-import argparse
 import json
 import logging
 import os
+from argparse import ArgumentParser
 from typing import Tuple, List, Dict
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def look_for_error(logs: List[str], triages: Dict[str, str]) -> Tuple[str, str]:
         for k, v in triages.items():
             if k in line:
                 logger.info("------------------------------------------------")
-                logger.info(f"ERROR FOUND:   {line}")
+                logger.info(f"ERROR FOUND:   {line.strip()}")
                 logger.info(f"RESOLUTION:    {v}")
                 logger.info("------------------------------------------------")
                 return line, v
@@ -53,22 +53,27 @@ def load_triages(triage_file_path: str) -> Dict[str, str]:
         raise Exception(f"Invalid JSON file: {e}")
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Analyze log file")
-    parser.add_argument("path", type=str, help="Path to a log file")
-    parser.add_argument("triage_file_path", type=str, help="a path to another file")
-    parser.add_argument(
+def args_parser() -> ArgumentParser:
+    arg_parser: ArgumentParser = ArgumentParser(description="Analyze log file")
+    arg_parser.add_argument("path", type=str, help="Path to a log file")
+    arg_parser.add_argument("triage_file_path", type=str, help="a path to another file")
+    arg_parser.add_argument(
         "-v", "--verbose", action="store_true", help="Set the log level to DEBUG"
     )
+    return arg_parser
 
+
+if __name__ == "__main__":
+    parser: ArgumentParser = args_parser()
     args = parser.parse_args()
     log_level = logging.INFO
-    # Set the log level
     if args.verbose:
         log_level = logging.DEBUG
-
-    logging.basicConfig(level=log_level)
-
+    logging.basicConfig(
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        level=log_level,
+        datefmt="%H:%M:%S",
+    )
     log_file: str = args.path
     triage_file: str = args.triage_file_path
     analyze_log_file(log_file, triage_file)
