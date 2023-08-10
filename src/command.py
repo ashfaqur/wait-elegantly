@@ -17,6 +17,8 @@ COMMAND_VALUES = "values"
 
 logger = logging.getLogger(__name__)
 
+root: Path = Path(__file__).parent.parent
+
 
 class Command:
     def __init__(self, command: Dict[str, Any]):
@@ -25,10 +27,7 @@ class Command:
         self.values: List[str] = command[COMMAND_VALUES]
 
     def run(self, triage_file: str) -> None:
-        log_dir = Path("build/log")
-        log_dir.mkdir(parents=True, exist_ok=True)
-
-        history_file: str = f"build/history/{self.id}.txt"
+        history_file: Path = root / Path(f"build/history/{self.id}.txt")
         history_times: List[int] = get_history_times(history_file)
 
         avg_time: int = 0
@@ -37,13 +36,8 @@ class Command:
             avg_time = round(sum(history_times) / len(history_times))
             logger.debug(f"Average time to complete: {avg_time}s")
 
-        now = datetime.now()
-        formatted_timestamp = now.strftime("%H-%M-%S_%d-%m-%Y")
-        log_file_name = f"{self.id}_{formatted_timestamp}.txt"
-        log_file_path = log_dir / log_file_name
-
-        logger.info(f"Running command: {self.name}")
-        logger.info(f"Log file located in: {log_file_path}")
+        log_file_path: Path = get_log_file_path(self.id)
+        logger.info(f"Running command '{self.name}' with log: {log_file_path}")
 
         with open(log_file_path, "w") as log_file:
             start_time = time.time()
@@ -70,8 +64,9 @@ class Command:
             bar.finish()
 
             if process.returncode != 0:
-                logger.error(f"Process '{self.name}' FAILED")
-                analyze_log_file(log_file_path, triage_file)
+                logger.error(f"Command '{self.name}' FAILED")
+                if triage_file:
+                    analyze_log_file(log_file_path, triage_file)
             else:
                 result: str = get_time_diff_result(total_time, avg_time)
                 logger.info(f"Command '{self.name}' SUCCESSFUL {result}")
@@ -89,21 +84,30 @@ def get_time_diff_result(total_time: int, expected_time: int) -> str:
         return f"in {total_time}s. Took {abs(difference)}s less than expected."
 
 
-def get_history(path: str) -> Path:
+def get_log_file_path(command_id: str) -> Path:
+    log_dir: Path = root / Path("build/log")
+    log_dir.mkdir(parents=True, exist_ok=True)
+    formatted_timestamp: str = datetime.now().strftime("%H-%M-%S_%d-%m-%Y")
+    log_file_name: str = f"{command_id}_{formatted_timestamp}.txt"
+    log_file_path: Path = log_dir / log_file_name
+    return log_file_path
+
+
+def get_history(path: Path) -> Path:
     history = Path(path)
     history.parent.mkdir(parents=True, exist_ok=True)
     history.touch()
     return history
 
 
-def get_history_times(path: str) -> List[int]:
+def get_history_times(path: Path) -> List[int]:
     history: Path = get_history(path)
     with open(history, "r") as f:
         numbers: List[int] = [int(line.strip()) for line in f]
         return numbers
 
 
-def add_history_time(path: str, total_time: int) -> None:
+def add_history_time(path: Path, total_time: int) -> None:
     history: Path = get_history(path)
     with history.open("a") as f:
         f.write(f"{total_time}\n")
