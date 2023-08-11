@@ -11,6 +11,14 @@ logger = logging.getLogger(__name__)
 
 class Progress:
     def __init__(self, history: List[int], granular: bool):
+        """
+        Initializes a Progress object.
+
+        :param history: A list of integers representing the history times.
+        :type history: List[int]
+        :param granular: Whether to use a granular progress bar.
+        :type granular: bool
+        """
         self.avg_time: int = -1
         self.max_time: int = -1
         self.min_time: int = -1
@@ -40,6 +48,9 @@ class Progress:
             stdout.write("\rIn Progress...")
 
     def update(self) -> None:
+        """
+        Updates the progress bar.
+        """
         if self.bar:
             if self.bar.value < self.bar.max_value:
                 self.bar.update(self.bar.value + 1)
@@ -52,6 +63,9 @@ class Progress:
                 stdout.flush()
 
     def finish(self) -> None:
+        """
+        Finishes the progress bar.
+        """
         if self.bar:
             self.bar.finish()
         else:
@@ -59,4 +73,10 @@ class Progress:
             stdout.flush()
 
     def expected_time(self) -> int:
+        """
+        Returns the expected time for the command to complete.
+
+        :return: The expected time for the command to complete.
+        :rtype: int
+        """
         return self.avg_time
