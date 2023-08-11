@@ -11,6 +11,16 @@ logger = logging.getLogger(__name__)
 
 
 def wait_elegantly(config: str, triage: str, granular: bool) -> None:
+    """
+    Executes a series of commands specified in a configuration file and reports progress.
+
+    :param config: The path to the configuration file in YAML format.
+    :type config: str
+    :param triage: The path to the triage file containing error resolutions.
+    :type triage: str
+    :param granular: Whether to use a granular progress bar.
+    :type granular: bool
+    """
     logger.debug(f"Loading yaml configuration file: {config}")
     if triage:
         logger.debug(f"Using triage file: {triage}")
@@ -24,6 +34,12 @@ def wait_elegantly(config: str, triage: str, granular: bool) -> None:
 
 
 def args_parser() -> ArgumentParser:
+    """
+    Parses command line arguments.
+
+    :return: An ArgumentParser object containing parsed command line arguments.
+    :rtype: ArgumentParser
+    """
     arg_parser: ArgumentParser = ArgumentParser(
         description="Wait elegantly while commands executes"
     )
