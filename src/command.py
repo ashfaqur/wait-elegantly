@@ -6,8 +6,8 @@ from subprocess import Popen
 from typing import Any
 from typing import List, Dict
 
-from src.analyze_log import analyze_log_file
-from src.progress import Progress
+from analyze_log import analyze_log_file
+from progress import Progress
 
 COMMANDS_KEY = "commands"
 COMMAND_NAME = "name"
@@ -44,7 +44,7 @@ class Command:
         history_times: List[int] = get_history_times(history_file)
 
         log_file_path: Path = get_log_file_path(self.id)
-        logger.info(f"Running command '{self.name}' with log: {log_file_path}")
+        logger.info(f"Running command '{self.name}' with log:\n{log_file_path}")
 
         start_time = time.time()
         process: Popen[Any] = self.run_command(log_file_path)
