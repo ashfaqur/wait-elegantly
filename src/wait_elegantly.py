@@ -1,6 +1,7 @@
 import logging
 import time
 from argparse import ArgumentParser
+from datetime import timedelta
 
 import yaml
 
@@ -30,7 +31,10 @@ def wait_elegantly(config: str, triage: str, granular: bool) -> None:
         data = yaml.safe_load(f)
     start_time = time.time()
     [Command(command).run(triage, granular) for command in data[COMMANDS_KEY]]
-    logger.info(f"Total time: {round(time.time() - start_time)}s")
+
+    total_time = str(timedelta(seconds=round(time.time() - start_time)))
+
+    logger.info(f"Total time: {total_time}")
 
 
 def args_parser() -> ArgumentParser:
